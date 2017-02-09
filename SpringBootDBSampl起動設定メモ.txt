@@ -1,0 +1,174 @@
+
+◆SpringBootDBSamplを立ち上がる前の設定手順「some-mongo」
+
+
+　①．docker ps　
+　②． docker run -it --link some-mongo:mongo --rm mongo sh -c 'exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'
+　③．27017のport追加設定
+　④. SpringBootDBSample の再起動　
+　⑤.http://localhost:1598/MemoBox/
+
+
+
+
+◆詳細操作ログ情報
+
+cqlsh:keyspacee> exit
+root@b148d2f323ff:/# exit
+exit
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                                                                      NAMES
+b148d2f323ff        cassandra:2.1.16    "/docker-entrypoint.s"   5 days ago          Up 5 days           0.0.0.0:7000->7000/tcp, 0.0.0.0:7199->7199/tcp, 0.0.0.0:9042->9042/tcp, 0.0.0.0:9160->9160/tcp, 7001/tcp   cassandra_2_1_16
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker run -it -p 27017:27017 --link some-mongo:mongo --rm mongo sh -c 'exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'
+Unable to find image 'mongo:latest' locally
+Trying to pull repository docker.io/library/mongo ...
+latest: Pulling from docker.io/library/mongo
+5040bd298390: Already exists
+ef697e8d464e: Pull complete
+67d7bf010c40: Pull complete
+bb0b4f23ca2d: Pull complete
+8efff42d23e5: Pull complete
+3df9f20d1d07: Pull complete
+7b43ac0a1517: Pull complete
+010dcda0f65b: Pull complete
+ec68d17240b3: Pull complete
+Digest: sha256:0d4453308cc7f0fff863df2ecb7aae226ee7fe0c5257f857fd892edf6d2d9057
+/usr/bin/docker-current: Error response from daemon: Could not get container for some-mongo.
+See '/usr/bin/docker-current run --help'.
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                                                                      NAMES
+b148d2f323ff        cassandra:2.1.16    "/docker-entrypoint.s"   5 days ago          Up 5 days           0.0.0.0:7000->7000/tcp, 0.0.0.0:7199->7199/tcp, 0.0.0.0:9042->9042/tcp, 0.0.0.0:9160->9160/tcp, 7001/tcp   cassandra_2_1_16
+[vagrant@localhost ~]$ sudo systemctl status firewalld
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; enabled; vendor preset: enabled)
+   Active: inactive (dead) since 金 2017-02-03 15:04:00 JST; 5 days ago
+ Main PID: 661 (code=exited, status=0/SUCCESS)
+
+ 2月 03 14:36:15 localhost.localdomain firewalld[661]: 2017-02-03 14:36:15 ERROR: COMMAND_FAILED: '/sbin/iptables -w2 -t nat -C OUTPUT -m addrtype --dst-type LOCAL -j DOCKER ! -... that name.
+ 2月 03 14:36:15 localhost.localdomain firewalld[661]: 2017-02-03 14:36:15 ERROR: COMMAND_FAILED: '/sbin/iptables -w2 -t nat -C POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQ... that name.
+ 2月 03 14:36:15 localhost.localdomain firewalld[661]: 2017-02-03 14:36:15 ERROR: COMMAND_FAILED: '/sbin/iptables -w2 -t nat -C DOCKER -i docker0 -j RETURN' failed: iptables: Ba...at chain?).
+ 2月 03 14:36:15 localhost.localdomain firewalld[661]: 2017-02-03 14:36:15 ERROR: COMMAND_FAILED: '/sbin/iptables -w2 -D FORWARD -i docker0 -o docker0 -j DROP' failed: iptables:...at chain?).
+ 2月 03 14:36:15 localhost.localdomain firewalld[661]: 2017-02-03 14:36:15 ERROR: COMMAND_FAILED: '/sbin/iptables -w2 -t filter -C FORWARD -i docker0 -o docker0 -j ACCEPT' faile...at chain?).
+ 2月 03 14:36:15 localhost.localdomain firewalld[661]: 2017-02-03 14:36:15 ERROR: COMMAND_FAILED: '/sbin/iptables -w2 -t filter -C FORWARD -i docker0 ! -o docker0 -j ACCEPT' fai...at chain?).
+ 2月 03 14:36:15 localhost.localdomain firewalld[661]: 2017-02-03 14:36:15 ERROR: COMMAND_FAILED: '/sbin/iptables -w2 -t filter -C FORWARD -o docker0 -m conntrack --ctstate RELA...at chain?).
+ 2月 03 14:36:15 localhost.localdomain firewalld[661]: 2017-02-03 14:36:15 ERROR: COMMAND_FAILED: '/sbin/iptables -w2 -t filter -C FORWARD -o docker0 -j DOCKER' failed: iptables... that name.
+ 2月 03 15:03:59 localhost.localdomain systemd[1]: Stopping firewalld - dynamic firewall daemon...
+ 2月 03 15:04:00 localhost.localdomain systemd[1]: Stopped firewalld - dynamic firewall daemon.
+Hint: Some lines were ellipsized, use -l to show in full.
+[vagrant@localhost ~]$ sudo systemctl start firewalld
+[vagrant@localhost ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                                                                      NAMES
+b148d2f323ff        cassandra:2.1.16    "/docker-entrypoint.s"   5 days ago          Up 5 days           0.0.0.0:7000->7000/tcp, 0.0.0.0:7199->7199/tcp, 0.0.0.0:9042->9042/tcp, 0.0.0.0:9160->9160/tcp, 7001/tcp   cassandra_2_1_16
+[vagrant@localhost ~]$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                                                                      NAMES
+b148d2f323ff        cassandra:2.1.16    "/docker-entrypoint.s"   5 days ago          Up 5 days           0.0.0.0:7000->7000/tcp, 0.0.0.0:7199->7199/tcp, 0.0.0.0:9042->9042/tcp, 0.0.0.0:9160->9160/tcp, 7001/tcp   cassandra_2_1_16
+[vagrant@localhost ~]$ docker run -it -p 27017:27017 --link some-mongo:mongo --rm mongo sh -c 'exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'
+/usr/bin/docker-current: Error response from daemon: Could not get container for some-mongo.
+See '/usr/bin/docker-current run --help'.
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                                                                      NAMES
+b148d2f323ff        cassandra:2.1.16    "/docker-entrypoint.s"   5 days ago          Up 5 days           0.0.0.0:7000->7000/tcp, 0.0.0.0:7199->7199/tcp, 0.0.0.0:9042->9042/tcp, 0.0.0.0:9160->9160/tcp, 7001/tcp   cassandra_2_1_16
+[vagrant@localhost ~]$ docker run --name some-mongo -d mongo
+ec3c6f406fcf983a667f52a8b4f0201e4648e6692114ca447b87e92d07969b0b
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                                                                      NAMES
+ec3c6f406fcf        mongo               "/entrypoint.sh mongo"   3 seconds ago       Up 2 seconds        27017/tcp                                                                                                  some-mongo
+b148d2f323ff        cassandra:2.1.16    "/docker-entrypoint.s"   5 days ago          Up 5 days           0.0.0.0:7000->7000/tcp, 0.0.0.0:7199->7199/tcp, 0.0.0.0:9042->9042/tcp, 0.0.0.0:9160->9160/tcp, 7001/tcp   cassandra_2_1_16
+[vagrant@localhost ~]$ docker run -it -p 27017:27017 --link some-mongo:mongo --rm mongo sh -c 'exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'
+MongoDB shell version v3.4.2
+connecting to: mongodb://172.17.0.2:27017/test
+MongoDB server version: 3.4.2
+Welcome to the MongoDB shell.
+For interactive help, type "help".
+For more comprehensive documentation, see
+        http://docs.mongodb.org/
+Questions? Try the support group
+        http://groups.google.com/group/mongodb-user
+Server has startup warnings:
+2017-02-09T05:14:47.906+0000 I CONTROL  [initandlisten]
+2017-02-09T05:14:47.906+0000 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2017-02-09T05:14:47.906+0000 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2017-02-09T05:14:47.906+0000 I CONTROL  [initandlisten]
+2017-02-09T05:14:47.907+0000 I CONTROL  [initandlisten]
+2017-02-09T05:14:47.907+0000 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+2017-02-09T05:14:47.907+0000 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2017-02-09T05:14:47.907+0000 I CONTROL  [initandlisten]
+2017-02-09T05:14:47.907+0000 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'.
+2017-02-09T05:14:47.907+0000 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2017-02-09T05:14:47.907+0000 I CONTROL  [initandlisten]
+>
+>
+>
+>
+>
+>
+> 
+bye
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker run -it -d -p 27017:27017 --link some-mongo:mongo  mongo sh -c 'exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'
+d958a8ab9ec8ca3b39d919afbd2e5f7d821ef04143dd281bde3b89a6057ed903
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                                                                                      NAMES
+d958a8ab9ec8        mongo               "/entrypoint.sh sh -c"   5 seconds ago       Up 4 seconds        0.0.0.0:27017->27017/tcp                                                                                   hopeful_khorana
+ec3c6f406fcf        mongo               "/entrypoint.sh mongo"   21 minutes ago      Up 21 minutes       27017/tcp                                                                                                  some-mongo
+b148d2f323ff        cassandra:2.1.16    "/docker-entrypoint.s"   5 days ago          Up 5 days           0.0.0.0:7000->7000/tcp, 0.0.0.0:7199->7199/tcp, 0.0.0.0:9042->9042/tcp, 0.0.0.0:9160->9160/tcp, 7001/tcp   cassandra_2_1_16
+[vagrant@localhost ~]$ docker stop hopeful_khorana  some-mongo
+hopeful_khorana
+some-mongo
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker rm hopeful_khorana  some-mongo
+hopeful_khorana
+some-mongo
+[vagrant@localhost ~]$ docker run --name some-mongo -d -p 27017:27017 mongo
+493b59ea093c312120b4ec13dcd608534a28b5a35cfb5474759546fda1f7294b
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker run -it -p 27017:27017 --link some-mongo:mongo --rm mongo sh -c 'exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'
+/usr/bin/docker-current: Error response from daemon: driver failed programming external connectivity on endpoint kickass_yalow (8183d11e5ff510509ae6c15dad543ad6f6693251f06d2afc54b7fe031918264b): Bind for 0.0.0.0:27017 failed: port is already allocated.
+
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$
+[vagrant@localhost ~]$ docker run -it --link some-mongo:mongo --rm mongo sh -c 'exec mongo "$MONGO_PORT_27017_TCP_ADDR:$MONGO_PORT_27017_TCP_PORT/test"'
+MongoDB shell version v3.4.2
+connecting to: mongodb://172.17.0.2:27017/test
+MongoDB server version: 3.4.2
+Welcome to the MongoDB shell.
+For interactive help, type "help".
+For more comprehensive documentation, see
+        http://docs.mongodb.org/
+Questions? Try the support group
+        http://groups.google.com/group/mongodb-user
+Server has startup warnings:
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten]
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten]
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten]
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten]
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'.
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+2017-02-09T05:37:46.127+0000 I CONTROL  [initandlisten]
+>
+>
+>
+>
